@@ -1,5 +1,4 @@
-seed = 9366
-X: error on input
-./Surrounding_Monster.exe won
+seed = 7750
+py ./player_Stratiuk_Arsenii.py won
 Score:
-0AGAINST20
+164AGAINST185

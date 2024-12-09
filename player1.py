@@ -74,13 +74,16 @@ def parse_field(height: int):
     :param player int: Represents whether we're the first or second player
     """
 
-    _ = input()
+    col_names = input()
+
     field = []
+    numbers = []
     for _ in range(height):
-        _, line = input().split()
+        num, line = input().split()
         field.append(line)
+        numbers.append(num)
     field = [list(line) for line in field]
-    return field
+    return col_names, numbers, field
 
 
 def parse_figure():
@@ -103,30 +106,25 @@ def parse_figure():
     for _ in range(height):
         l = input()
         figure.append(l)
-    # debug(f'figure: {figure}')
     return height, width, figure
 
 def where_to_put(my_positions_on_field, field, h_figure, w_figure, figure, symbol):
     """
     Checks possible placements by overlapping the figure with each player's symbol on the field.
 
-    :param my_positions_on_field: List of (row, column) positions 
-        of the player's symbols on the field.
+    :param stars_positions_on_field: List of (row, column) positions of the player's symbols on the field.
     :param field: Current game field as a 2D list.
     :param h_figure: Height of the figure.
     :param w_figure: Width of the figure.
     :param figure: The figure to be placed as a 2D list.
     :param symbol: Current player's symbol ('O' or 'X').
-
     :return: List of valid field configurations after placing the figure.
     """
     lst_of_correct_coordinates = []
-    lst_of_correct_fields = []
     opponent_symbols = 'Xx' if symbol == 'O' else 'Oo'
     top_left_x, top_left_y = 0, 0
 
-    coordinates_of_figure_stars = [(fx, fy) for fx in range(h_figure) for fy in range(w_figure) \
-                                   if figure[fx][fy] == '*']
+    coordinates_of_figure_stars = [(fx, fy) for fx in range(h_figure) for fy in range(w_figure) if figure[fx][fy] == '*']
 
     candidates = []
     for field_x, field_y in my_positions_on_field:
@@ -158,24 +156,26 @@ def where_to_put(my_positions_on_field, field, h_figure, w_figure, figure, symbo
 
         if correct_placement and overlaps_count == 1:
             lst_of_correct_coordinates.append((top_left_x, top_left_y))
-            lst_of_correct_fields.append(new_field)
 
-    return lst_of_correct_coordinates, lst_of_correct_fields
+    return lst_of_correct_coordinates
 
-def get_manhattan_distance(height, width, field, symbol):
+
+
+def get_manhattan_distance(row, col, figure, oponent_positions_on_field):
     """Calculates manhattan_distance from my point to opponent closest point"""
     list_of_distances = []
-    opponent_symbols = 'Xx' if symbol == 'O' else 'Oo'
-    my_positions_on_field = [(r, c) for r in range(height) for c in range(width) \
-                            if field[r][c] == symbol]
-    oponent_positions_on_field = [(r, c) for r in range(height) for c in range(width) \
-                            if field[r][c] in opponent_symbols]
+
+    my_positions_on_field = [(r + row, c + col) for r in range(len(figure)) for c in range(len(figure[0])) if figure[r][c] == '*']
+
     for mine_x, mine_y in my_positions_on_field:
         for opponent_x, opponent_y in oponent_positions_on_field:
             distance = abs(mine_x - opponent_x) + abs(mine_y - opponent_y)
             list_of_distances.append(distance)
     list_of_distances = sorted(list_of_distances)
     return list_of_distances[0]
+
+
+
 
 
 def step(player: int):
@@ -185,23 +185,24 @@ def step(player: int):
     :param player int: Represents whether we're the first or second player
     """
     symbol = 'O' if player == 1 else 'X'
+    opponent_symbols = 'Xx' if player == 1 else 'Oo'
     height, width = parse_field_info()
-    field = parse_field(height)
+    _, _, field = parse_field(height)
     h_figure, w_figure, figure = parse_figure()
 
-    my_positions_on_field = [(r, c) for r in range(height) for c in range(width) \
-                            if field[r][c] == symbol]
+    my_positions_on_field = [(r, c) for r in range(height) for c in range(width) if field[r][c] == symbol]
 
-    list_of_possible_coordinates, lst_of_correct_fields = where_to_put(my_positions_on_field, \
-                                                                        field, h_figure, \
-                                                                        w_figure, figure, \
-                                                                        symbol)
+    list_of_possible_coordinates = where_to_put(my_positions_on_field, field, h_figure, w_figure, figure, symbol)
+    if not list_of_possible_coordinates:
+        return None
     lst_of_calculated_coordinates = []
 
-    length = len(lst_of_correct_fields)
-    for i in range(length):
-        smallest_distance = get_manhattan_distance(height, width, lst_of_correct_fields[i], symbol)
-        lst_of_calculated_coordinates.append((list_of_possible_coordinates[i], smallest_distance))
+    opponent_symbols = 'Xx' if symbol == 'O' else 'Oo'
+    oponent_positions_on_field = [(r, c) for r in range(height) for c in range(width) if field[r][c] in opponent_symbols]
+
+    for r, c in list_of_possible_coordinates:
+        smallest_distance = get_manhattan_distance(r, c, figure, oponent_positions_on_field)
+        lst_of_calculated_coordinates.append(((r, c), smallest_distance))
     lst_of_calculated_coordinates = sorted(lst_of_calculated_coordinates, key = lambda x: x[1])
 
     return lst_of_calculated_coordinates[0][0]
@@ -242,3 +243,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
