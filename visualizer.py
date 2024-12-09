@@ -5,8 +5,8 @@ from tkinter import *
 
 file = open("vlogs.txt", "w")
 debug = True
-box_w = 12
-box_h = 12
+box_w = 10
+box_h = 10
 
 def log(s):
 	if debug:
