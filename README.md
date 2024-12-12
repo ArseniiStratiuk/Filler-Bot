@@ -31,9 +31,9 @@ The bot is designed to compete in the Filler game by analyzing the game board an
 
 To run the bot against the other one, use the following command for Windows OS:
 ```sh
-ruby ./filler_vm -f ./map00 -p1 "py ./player1.py" -p2 "py ./player1.py"
+ruby ./filler_vm -f ./map00 -p1 "py ./player_Stratiuk_Arsenii.py" -p2 "py ./player_Stratiuk_Arsenii.py"
 ```
 And to use a visualizer:
 ```sh
-ruby ./filler_vm -f ./map00 -p1 "py ./player1.py" -p2 "py ./player1.py" | py visualizer.py
+ruby ./filler_vm -f ./map00 -p1 "py ./player_Stratiuk_Arsenii.py" -p2 "py ./player_Stratiuk_Arsenii.py" | py visualizer.py
 ```
